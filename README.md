@@ -34,7 +34,7 @@ This repository is not:
 
 It is strictly a verifier.
 
----
+----
 
 ## Relationship to veip-spec
 
