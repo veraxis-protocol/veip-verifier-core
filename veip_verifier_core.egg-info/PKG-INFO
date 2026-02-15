@@ -1,0 +1,226 @@
+Metadata-Version: 2.4
+Name: veip-verifier-core
+Version: 0.1.0
+Summary: Canonical schema validation and deterministic replay verification for VEIP Evidence Packs.
+Author: Veraxis Execution Integrity Protocol Authors
+License: # VEIP License (Reference Implementation License) v0.1.0
+        
+        Copyright (c) 2026 Veraxis Protocol Contributors
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        1. **Preservation of notices.**
+           The above copyright notice and this license notice shall be included in all
+           copies or substantial portions of the Software.
+        
+        2. **No certification or endorsement claims.**
+           The Software is a reference implementation and verifier logic for the VEIP
+           specification. You may not represent that use of the Software—alone or in
+           combination with any other system—confers certification, endorsement, or
+           regulatory approval.
+        
+        3. **Trademark and certification terms reserved.**
+           The names “VEIP”, “Veraxis Execution Integrity Protocol”, “Veraxis”, and any
+           related marks, along with terms such as “VEIP Certified” and “VEIP Compliant”,
+           are reserved and may be used only as permitted under the VEIP trademark and
+           registry policy (published separately). This license does not grant rights
+           to use trademarks except as necessary for reasonable and truthful
+           nominative use (e.g., stating that Software is compatible with VEIP).
+        
+        4. **Spec alignment integrity (no misleading forks).**
+           If you distribute a modified version of the Software, you must clearly mark
+           it as modified and must not misrepresent it as the canonical Verifier Core.
+           If behavior diverges from the VEIP specification, you must document the
+           divergence in a prominent location.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: jsonschema>=4.22.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Dynamic: license-file
+
+# VEIP Verifier Core
+
+Canonical schema validation and deterministic replay verification for VEIP Evidence Packs.
+
+The VEIP Verifier Core is the reference verification engine for the Veraxis Execution Integrity Protocol (VEIP). It validates Evidence Packs against the canonical schema and performs deterministic replay checks to detect tampering or structural nonconformance.
+
+This repository defines the verification surface. It does not define certification, registry governance, or supervisory endorsement.
+
+---
+
+## Purpose
+
+The Verifier Core provides:
+
+- Schema validation against the canonical VEIP Evidence Pack schema  
+- Deterministic canonicalization of Evidence Packs  
+- Integrity binding verification (hash verification / tamper detection)  
+- Machine-readable verification outcomes (PASS / FAIL with reason codes)  
+- A stable CLI interface for local and CI integration  
+
+The implementation is intentionally minimal, auditable, and reproducible.
+
+---
+
+## What this repository is not
+
+This repository is not:
+
+- A multi-operator registry (see `veip-registry`)  
+- A supervisory endorsement authority  
+- A certification body  
+- A production WORM storage system  
+- A policy execution engine  
+
+It is strictly a verifier.
+
+----
+
+## Relationship to veip-spec
+
+The canonical Evidence Pack schema is defined in:
+
+```
+
+veip-spec/schemas/veip-evidence-pack.schema.json
+
+```
+
+This repository vendors that schema into:
+
+```
+
+schemas/veip-evidence-pack.schema.json
+
+````
+
+The schema in this repository is treated as authoritative for verification logic.
+
+Verifier Core versions must remain aligned with `veip-spec` schema versions.
+
+---
+
+## Quickstart (Local Development)
+
+Python 3.10+
+
+Install:
+
+```bash
+python -m pip install -e ".[dev]"
+make ci
+````
+
+Validate an Evidence Pack:
+
+```bash
+veip-verify validate tests/fixture_pack.json
+```
+
+Replay and verify integrity bindings:
+
+```bash
+veip-verify replay tests/fixture_pack.json
+```
+
+Print schema information:
+
+```bash
+veip-verify schema
+```
+
+---
+
+## CLI Contract (Stable Surface)
+
+Initial CLI version: `v0.1.0`
+
+### Commands
+
+* `veip-verify validate <path>`
+  Perform schema validation against the canonical VEIP schema.
+
+* `veip-verify replay <path>`
+  Canonicalize the Evidence Pack and verify integrity bindings.
+
+* `veip-verify schema`
+  Print schema path and schema SHA256 fingerprint.
+
+---
+
+## Exit Codes
+
+* `0` — Verification PASS
+* `2` — Verification FAIL (invalid, tampered, or nonconformant)
+* `3` — Tool/runtime error
+
+Exit codes are stable and part of the public contract.
+
+---
+
+## Versioning
+
+Verifier Core version: `0.1.0`
+Aligned VEIP specification version: `0.1.0`
+
+Breaking changes follow semantic versioning and must track schema changes in `veip-spec`.
+
+If the schema changes in a backward-incompatible way, the Verifier Core major version must increment.
+
+---
+
+## Security Model (Minimal Scope)
+
+The Verifier Core assumes:
+
+* The Evidence Pack is provided as a JSON artifact.
+* Integrity bindings are deterministic and reproducible.
+* Canonicalization is stable across environments.
+* The verifier itself is auditable and reproducible from source.
+
+The Verifier Core does not:
+
+* Provide cryptographic signing
+* Manage keys
+* Issue certificates
+* Provide registry-level endorsement
+
+---
+
+## Licensing and Trademark
+
+This repository is released under the VEIP License (see `LICENSE.md`).
+
+Use of terms such as:
+
+* “VEIP Certified”
+* “VEIP Compliant”
+* “Veraxis, Veraxis Execution Integrity Protocol”
+
+is governed separately by VEIP trademark and registry policy.
+This repository does not grant certification status.
+
+---
+
+## Status
+
+Reference implementation — minimal surface, specification-aligned.
+
+Further hardening and conformance test suites are expected in future minor releases.
+

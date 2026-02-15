@@ -1,0 +1,2 @@
+[console_scripts]
+veip-verify = veip_verifier_core.cli:main

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veraxis-protocol.github.io/veip/schemas/veip_evidence_pack.schema.json",
+  "title": "VEIP Evidence Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "created_at",
+    "authority",
+    "policy",
+    "action",
+    "decision",
+    "execution",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+\\.[0-9]+$"
+    },
+    "evidence_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope_id", "issuer", "valid_from", "valid_to", "constraints_ref"],
+      "properties": {
+        "scope_id": { "type": "string", "minLength": 1 },
+        "issuer": { "type": "string", "minLength": 1 },
+        "valid_from": { "type": "string", "format": "date-time" },
+        "valid_to": { "type": "string", "format": "date-time" },
+        "constraints_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_id", "policy_version", "policy_hash"],
+      "properties": {
+        "policy_id": { "type": "string", "minLength": 1 },
+        "policy_version": { "type": "string", "minLength": 1 },
+        "policy_hash": { "type": "string", "minLength": 8 }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "action_type", "proposed_at", "context_refs"],
+      "properties": {
+        "action_id": { "type": "string", "minLength": 1 },
+        "action_type": { "type": "string", "minLength": 1 },
+        "proposed_at": { "type": "string", "format": "date-time" },
+        "context_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "reason_code", "evaluated_at"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["ALLOW", "DENY", "ESCALATE", "SUPERVISORY"]
+        },
+        "reason_code": { "type": "string", "minLength": 1 },
+        "evaluated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executed", "executed_at", "executor", "outcome"],
+      "properties": {
+        "executed": { "type": "boolean" },
+        "executed_at": { "type": "string", "format": "date-time" },
+        "executor": { "type": "string", "minLength": 1 },
+        "outcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "result_ref"],
+          "properties": {
+            "status": { "type": "string", "enum": ["SUCCESS", "FAILURE", "SKIPPED"] },
+            "result_ref": { "type": "string", "minLength": 1 }
+          }
+        },
+        "supervisory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "resolved"],
+          "properties": {
+            "required": { "type": "boolean" },
+            "resolved": { "type": "boolean" },
+            "supervisor_id": { "type": "string" },
+            "resolution_at": { "type": "string", "format": "date-time" },
+            "resolution": { "type": "string", "enum": ["APPROVE", "REJECT", "PAUSE", "ESCALATE"] }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system_id", "build", "environment"],
+      "properties": {
+        "system_id": { "type": "string", "minLength": 1 },
+        "build": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "commit"],
+          "properties": {
+            "version": { "type": "string", "minLength": 1 },
+            "commit": { "type": "string", "minLength": 7 }
+          }
+        },
+        "environment": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
