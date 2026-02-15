@@ -1,36 +1,46 @@
-# VEIP Verifier Core (Reference)
+# VEIP Verifier Core
 
-Verifier Core for the Veraxis Execution Integrity Protocol (VEIP): schema validation + deterministic replay checks for VEIP Evidence Packs.
+Canonical schema validation + deterministic replay verification for VEIP Evidence Packs.
 
-This repository is a minimal, operator-neutral reference implementation of “verification” logic. It does not provide certification, endorsement, or registry services.
+This repository is the **Verifier Core** for the Veraxis Execution Integrity Protocol (VEIP). It provides the reference logic to:
+
+- Validate VEIP Evidence Packs against the canonical schema
+- Canonicalize packs deterministically (stable JSON)
+- Verify integrity bindings (hashes) and detect tampering
+- Produce machine-readable verification outcomes (PASS/FAIL + reason codes)
+- Provide a CLI for local and CI integration
+
+It is intentionally minimal and auditable. It is **not** a registry and it is **not** an endorsement mechanism.
 
 ## What it does
 
-- Validates a VEIP Evidence Pack against the canonical JSON Schema (`schemas/veip-evidence-pack.schema.json`)
-- Performs deterministic replay checks (canonicalization + hash binding) for tamper detection
-- Exposes both:
-  - a Python API (`veip_verifier_core`)
-  - a CLI (`veip-verifier-core`)
+- `validate`: schema validation against `schemas/veip-evidence-pack.schema.json`
+- `replay`: deterministic canonicalization + hash verification (tamper detection)
+- `cli`: `veip-verify ...` commands to validate and verify packs
 
 ## What it is not
 
-- Not a certification authority
-- Not a registry / storage system
-- Not a supervisory endorsement mechanism
-- Not a production “attestation” service (no keys, signing, timestamping)
+- Not a multi-operator registry (see `veip-registry`)
+- Not an “authority issuer” or policy engine
+- Not a cryptographic signing service
+- Not a certification authority by itself
 
-## Inputs / Outputs
+## Relationship to veip-spec
 
-Input: a VEIP Evidence Pack JSON document.
+- The canonical Evidence Pack schema is defined in `veip-spec/schemas/veip-evidence-pack.schema.json`
+- This repo vendors that schema into `schemas/` and treats it as authoritative
+- Verifier behavior is intended to remain aligned with `veip-spec` versions (see Versioning)
 
-Output:
-- `PASS` if schema-valid and replay-valid
-- `FAIL` with a precise reason if invalid
-
-## Quickstart
+## Quickstart (local)
 
 Python 3.10+
 
 ```bash
 python -m pip install -e ".[dev]"
 make ci
+
+# validate a pack
+veip-verify validate tests/fixture_pack.json
+
+# replay/verify tamper detection
+veip-verify replay tests/fixture_pack.json
