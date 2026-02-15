@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1.0",
+  "evidence_id": "54d8baa4-b38b-4f69-adc1-b95040d283e8",
+  "created_at": "2026-02-15T19:14:10.032001+00:00",
+  "authority": {
+    "scope_id": "SCOPE1",
+    "issuer": "Issuer",
+    "permitted_actions": [
+      "TRANSFER"
+    ],
+    "valid": true
+  },
+  "policy": {
+    "policy_id": "policy/example",
+    "policy_version": "0.1.0",
+    "ruleset_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "action": {
+    "action_id": "fe10b3ede50c4f8eae24a8d70a688c57",
+    "action_type": "TRANSFER",
+    "payload": {
+      "amount": 10
+    },
+    "context_refs": [
+      "context/example"
+    ]
+  },
+  "decision": {
+    "classification": "ALLOW",
+    "reason_code": "RULE_MATCH",
+    "evaluated_at": "2026-02-15T19:14:10.032001+00:00"
+  },
+  "execution": {
+    "executed": true,
+    "executed_at": "2026-02-15T19:14:10.032001+00:00",
+    "executor": "demo",
+    "result": {
+      "status": "ok"
+    },
+    "integrity": {
+      "pack_sha256": "ee2f8fca1f50020c7b36cb6d7989cebe08d92c47751ba980af4b74d02f982b9b",
+      "computed_at": "2026-02-15T19:14:10.032001+00:00"
+    }
+  },
+  "provenance": {
+    "build": {
+      "repo": "local",
+      "commit": "0000000",
+      "artifact": "veip-verifier-core",
+      "version": "0.1.0"
+    },
+    "generator": {
+      "name": "veip-verifier-core",
+      "version": "0.1.0"
+    }
+  }
+}
