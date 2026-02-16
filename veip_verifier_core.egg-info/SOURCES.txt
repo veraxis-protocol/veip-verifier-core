@@ -5,6 +5,7 @@ pyproject.toml
 ./veip_verifier_core/replay.py
 ./veip_verifier_core/schema.py
 tests/test_cli.py
+tests/test_tamper.py
 veip_verifier_core/cli.py
 veip_verifier_core/replay.py
 veip_verifier_core/schema.py
