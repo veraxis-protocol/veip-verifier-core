@@ -4,6 +4,8 @@ pyproject.toml
 ./veip_verifier_core/cli.py
 ./veip_verifier_core/replay.py
 ./veip_verifier_core/schema.py
+tests/test_cli.py
+veip_verifier_core/cli.py
 veip_verifier_core/replay.py
 veip_verifier_core/schema.py
 veip_verifier_core.egg-info/PKG-INFO
