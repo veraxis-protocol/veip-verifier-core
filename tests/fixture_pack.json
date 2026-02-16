@@ -33,7 +33,7 @@
     "executor": "demo",
     "outcome": {
       "status": "SUCCESS",
-      "result_ref": "sha256:78e2fc9cb376e95824d92bbed95aaaa9fa49065ca913a80ca89a222dc18b4785"
+      "result_ref": "sha256:009d7196be384639d8da51d4f42c7240c547237f374b1f41df5683b26066cefe"
     }
   },
   "provenance": {

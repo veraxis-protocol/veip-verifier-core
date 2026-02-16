@@ -3,21 +3,23 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional
 
 
-class ReplayError(ValueError):
-    pass
+@dataclass(frozen=True)
+class IntegrityResult:
+    ok: bool
+    reason: str
+    expected: Optional[str] = None
+    got: Optional[str] = None
 
 
-def _canonical_json_bytes(obj: Any) -> bytes:
+def canonicalize_json(obj: Any) -> bytes:
     """
-    Canonical JSON encoding:
-    - UTF-8
-    - sorted keys
-    - no insignificant whitespace
-    - stable for hashing
+    Canonical JSON bytes for hashing:
+      - sorted keys
+      - no extra whitespace
+      - UTF-8
     """
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
 
@@ -26,83 +28,70 @@ def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def canonicalize_for_binding(evidence_pack: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
+def _extract_binding_from_pack(evidence_pack: Dict[str, Any]) -> Optional[str]:
     """
-    Produce the canonical bytes used for integrity binding.
-    Strategy:
-      - Copy pack
-      - Remove existing execution.integrity and any derived digest fields if present
-      - Hash the rest deterministically
+    Carrier for the binding digest (schema-allowed):
+      evidence_pack.execution.outcome.result_ref = "sha256:<64-hex>"
     """
-    if not isinstance(evidence_pack, dict):
-        raise ReplayError("Evidence Pack must be an object.")
-
-    pack = json.loads(json.dumps(evidence_pack))  # deep copy via JSON-safe roundtrip
-
-    # Remove integrity block before hashing (it is self-referential).
-    exec_block = pack.get("execution")
-    if isinstance(exec_block, dict):
-        exec_block.pop("integrity", None)
-
-    # Optionally remove top-level derived fields if present in future versions
-    pack.pop("integrity", None)
-
-    b = _canonical_json_bytes(pack)
-    return b, pack
+    exe = evidence_pack.get("execution")
+    if not isinstance(exe, dict):
+        return None
+    out = exe.get("outcome")
+    if not isinstance(out, dict):
+        return None
+    rr = out.get("result_ref")
+    if not isinstance(rr, str):
+        return None
+    if rr.startswith("sha256:") and len(rr) == len("sha256:") + 64:
+        return rr.split("sha256:", 1)[1]
+    return None
 
 
-@dataclass(frozen=True)
-class IntegrityResult:
-    ok: bool
-    expected: str
-    computed: str
-    reason: str
+def _pack_without_binding_carrier(evidence_pack: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Return a deep-copied pack with the binding carrier removed/blanked so hashing
+    does not include the stored digest (prevents self-referential hashes).
+    """
+    # JSON round-trip is a simple deep copy for dict/list primitives.
+    p = json.loads(json.dumps(evidence_pack))
+
+    exe = p.get("execution")
+    if isinstance(exe, dict):
+        out = exe.get("outcome")
+        if isinstance(out, dict) and "result_ref" in out:
+            # Keep the field (schema requires it) but blank it deterministically.
+            out["result_ref"] = "sha256:" + ("0" * 64)
+
+    return p
 
 
 def compute_integrity_binding(evidence_pack: Dict[str, Any]) -> str:
-    b, _ = canonicalize_for_binding(evidence_pack)
-    return sha256_hex(b)
-
-
-def verify_integrity_binding(evidence_pack: Dict[str, Any]) -> IntegrityResult:
     """
-    Verify execution.integrity.pack_sha256 against the canonicalized Evidence Pack hash.
-    Expected shape:
-      execution: { integrity: { pack_sha256: <hex> , computed_at?: <iso8601> } }
+    Compute the canonical pack SHA256 over the schema-conformant object,
+    excluding the binding carrier field (execution.outcome.result_ref).
     """
-    exec_block = evidence_pack.get("execution")
-    if not isinstance(exec_block, dict):
-        return IntegrityResult(False, expected="", computed="", reason="missing execution block")
-
-    integrity = exec_block.get("integrity")
-    if not isinstance(integrity, dict):
-        return IntegrityResult(False, expected="", computed="", reason="missing execution.integrity block")
-
-    expected = integrity.get("pack_sha256")
-    if not isinstance(expected, str) or len(expected) != 64:
-        return IntegrityResult(False, expected=str(expected), computed="", reason="missing/invalid integrity.pack_sha256")
-
-    computed = compute_integrity_binding(evidence_pack)
-
-    if computed != expected:
-        return IntegrityResult(False, expected=expected, computed=computed, reason="hash mismatch")
-
-    return IntegrityResult(True, expected=expected, computed=computed, reason="ok")
+    p = _pack_without_binding_carrier(evidence_pack)
+    return sha256_hex(canonicalize_json(p))
 
 
-def attach_integrity_binding(evidence_pack: Dict[str, Any], *, computed_at: str | None = None) -> Dict[str, Any]:
+def verify_integrity_binding(evidence_pack: Dict[str, Any], require_binding: bool = False) -> IntegrityResult:
     """
-    Attach execution.integrity.pack_sha256 to a pack (mutates a copy, returns new dict).
+    Verify that the pack's stored binding matches the computed binding.
+    If require_binding=True and no binding is present, verification FAILS.
     """
-    pack = json.loads(json.dumps(evidence_pack))
-    pack.setdefault("execution", {})
-    if not isinstance(pack["execution"], dict):
-        raise ReplayError("execution must be an object")
-    pack["execution"].setdefault("integrity", {})
-    if not isinstance(pack["execution"]["integrity"], dict):
-        raise ReplayError("execution.integrity must be an object")
+    got = _extract_binding_from_pack(evidence_pack)
+    if got is None:
+        if require_binding:
+            return IntegrityResult(
+                False,
+                "missing binding (execution.outcome.result_ref sha256:<digest>)",
+                expected=None,
+                got=None,
+            )
+        return IntegrityResult(True, "no binding present (not required)", expected=None, got=None)
 
-    digest = compute_integrity_binding(pack)
-    pack["execution"]["integrity"]["pack_sha256"] = digest
-    pack["execution"]["integrity"]["computed_at"] = computed_at or datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
-    return pack
+    expected = compute_integrity_binding(evidence_pack)
+    if got == expected:
+        return IntegrityResult(True, "binding matches", expected=expected, got=got)
+
+    return IntegrityResult(False, "binding mismatch", expected=expected, got=got)
