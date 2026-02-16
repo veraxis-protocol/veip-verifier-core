@@ -14,9 +14,9 @@ for f in "$${req[@]}"; do \
   if [[ ! -f "$$f" ]]; then echo "Missing required file: $$f"; exit 1; fi; \
 done; \
 python - <<'PY' \
-import json, pathlib \
-p = pathlib.Path("veip_verifier_core/schemas/veip-evidence-pack.schema.json") \
-json.loads(p.read_text(encoding="utf-8")) \
+import json, pathlib; \
+p = pathlib.Path("veip_verifier_core/schemas/veip-evidence-pack.schema.json"); \
+json.loads(p.read_text(encoding="utf-8")); \
 print("OK: schema JSON parses") \
 PY
 @echo "OK: checks passed"
