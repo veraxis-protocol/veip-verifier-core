@@ -31,24 +31,17 @@
     "executed": true,
     "executed_at": "2026-02-15T19:17:18.986305+00:00",
     "executor": "demo",
-    "result": {
-      "status": "ok"
-    },
-    "integrity": {
-      "pack_sha256": "ffb97a9af783710febc029120cdfceabcf72df2c2766059bcde83716dabd164a",
-      "computed_at": "2026-02-15T19:32:06.192344+00:00"
+    "outcome": {
+      "status": "SUCCESS",
+      "result_ref": "sha256:78e2fc9cb376e95824d92bbed95aaaa9fa49065ca913a80ca89a222dc18b4785"
     }
   },
   "provenance": {
+    "system_id": "veip-verifier-core",
     "build": {
-      "repo": "local",
-      "commit": "0000000",
-      "artifact": "veip-verifier-core",
-      "version": "0.1.0"
+      "version": "0.1.0",
+      "commit": "0000000"
     },
-    "generator": {
-      "name": "veip-verifier-core",
-      "version": "0.1.0"
-    }
+    "environment": "local"
   }
 }
