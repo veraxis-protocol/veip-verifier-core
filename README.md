@@ -8,6 +8,24 @@ This repository defines the verification surface. It does not define certificati
 
 ---
 
+## Role in Open Institutional Computation
+
+**Category:** Open Institutional Computation  
+**This component:** Reference verification engine for the structural and integrity properties of a VEIP Evidence Pack  
+**Upstream:** An Evidence Pack already emitted by a VEIP implementation, itself downstream of machine-operational authority/control state established through authorized institutional interpretation and admission (the Veraxis reference path for that upstream problem is [OIC — Open Institutional Compiler](https://github.com/veraxis-protocol/Institutional-Compiler))  
+**Downstream:** Machine-readable PASS/FAIL verification outcomes for local, CI, registry and examination use  
+**Canonical category thesis:** https://github.com/veraxis-protocol/institutional-continuity/blob/main/THESIS.md
+
+### What a PASS does and does not establish
+
+This verifier verifies the structural/integrity properties of a downstream VEIP Evidence Pack. A PASS does not by itself establish that upstream institutional authority was legitimate, correctly interpreted, properly admitted, or currently applicable unless those properties are themselves covered by the verified inputs/profile.
+
+A cryptographically and structurally sound Evidence Pack is evidence *about* a binding. It is not the origin of the institutional authority it records, and it does not certify its own upstream validity.
+
+Architectural role does not imply production readiness; see "What this repository is not", "Security Model (Minimal Scope)" and "Status" below for the exact demonstrated scope.
+
+---
+
 ## Purpose
 
 The Verifier Core provides:
