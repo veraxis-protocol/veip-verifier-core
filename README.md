@@ -12,6 +12,7 @@ This repository defines the verification surface. It does not define certificati
 
 **Category:** Open Institutional Computation  
 **This component:** Reference verification engine for the structural and integrity properties of a VEIP Evidence Pack  
+**VEIP — Veraxis Execution Integrity Protocol:** the execution-integrity and interoperability boundary that binds already-established machine-operational authority/control state to an exact action and runtime disposition, and emits the Evidence Packs this verifier checks. VEIP does not interpret governing documents, perform institutional admission, or originate institutional authority.  
 **Upstream:** An Evidence Pack already emitted by a VEIP implementation, itself downstream of machine-operational authority/control state established through authorized institutional interpretation and admission (the Veraxis reference path for that upstream problem is [OIC — Open Institutional Compiler](https://github.com/veraxis-protocol/Institutional-Compiler))  
 **Downstream:** Machine-readable PASS/FAIL verification outcomes for local, CI, registry and examination use  
 **Canonical category thesis:** https://github.com/veraxis-protocol/institutional-continuity/blob/main/THESIS.md
