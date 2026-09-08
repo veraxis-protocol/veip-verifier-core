@@ -20,7 +20,7 @@ This repository defines the verification surface. It does not define certificati
 
 This verifier verifies the structural/integrity properties of a downstream VEIP Evidence Pack. A PASS does not by itself establish that upstream institutional authority was legitimate, correctly interpreted, properly admitted, or currently applicable unless those properties are themselves covered by the verified inputs/profile.
 
-A cryptographically and structurally sound Evidence Pack is evidence *about* a binding. It is not the origin of the institutional authority it records, and it does not certify its own upstream validity.
+A cryptographically valid Evidence Pack establishes only the bounded cryptographic and structural integrity properties actually verified under the applicable schema/profile. It does not by itself establish truth, completeness, institutional validity, correct upstream interpretation, consequence occurrence, or observation coverage. It is evidence *about* a binding: not the origin of the institutional authority it records, and not a certificate of its own upstream validity.
 
 Architectural role does not imply production readiness; see "What this repository is not", "Security Model (Minimal Scope)" and "Status" below for the exact demonstrated scope.
 
